@@ -87,7 +87,7 @@ void dl_resolv_init64()
 	{
 		fseek(fp, g_ELF_header.e_shoff + sizeof(Elf64_Shdr) * i, 0);
 		fread(&t_ELF_Shdr, sizeof(Elf64_Shdr), 1u, fp);
-		if (t_ELF_Shdr.sh_type == 6)		//dynamic
+		if (t_ELF_Shdr.sh_type == SHT_DYNAMIC)		
 		{
 			g_dym_addr = t_ELF_Shdr.sh_addr;
 			d_offset = t_ELF_Shdr.sh_offset;
@@ -100,19 +100,19 @@ void dl_resolv_init64()
 		int sig = 0;
 		switch (t_ELF_Dyn.d_tag)
 		{
-		case 23:	//rel
+		case DT_JMPREL:	
 			g_rel_addr = t_ELF_Dyn.d_un.d_ptr;
 			break;
-		case 3:	//gotplt
+		case DT_PLTGOT:	
 			g_got_addr = t_ELF_Dyn.d_un.d_ptr;
 			break;
-		case DT_SYMTAB:	//sym
+		case DT_SYMTAB:	
 			g_dsym_addr = t_ELF_Dyn.d_un.d_ptr;
 			break;
-		case 5:	//str
+		case DT_STRTAB:	
 			g_str_addr = t_ELF_Dyn.d_un.d_ptr;
 			break;
-		case 0:
+		case  DT_NULL:
 			sig = 1;
 			break;
 		}
@@ -134,7 +134,7 @@ void load64(int argc, char** argv)
 	{
 		fseek(fp, g_ELF_header.e_phoff + sizeof(Elf64_Phdr) * i, 0);
 		fread(&t_ELF_Phdr, sizeof(Elf64_Phdr), 1u, fp);
-		if (t_ELF_Phdr.p_type == 1)		//LOAD
+		if (t_ELF_Phdr.p_type == PT_LOAD)		
 		{
 			if (max < t_ELF_Phdr.p_vaddr + t_ELF_Phdr.p_memsz)
 				max = t_ELF_Phdr.p_vaddr + t_ELF_Phdr.p_memsz;
@@ -149,7 +149,7 @@ void load64(int argc, char** argv)
 	{
 		fseek(fp, g_ELF_header.e_phoff + sizeof(Elf64_Phdr) * i, 0);
 		fread(&t_ELF_Phdr, sizeof(Elf64_Phdr), 1u, fp);
-		if (t_ELF_Phdr.p_type == 1)
+		if (t_ELF_Phdr.p_type == PT_LOAD)
 		{
 			fseek(fp, t_ELF_Phdr.p_offset, 0);
 			fread(&buf, 1u, t_ELF_Phdr.p_filesz, fp);
